@@ -12,11 +12,11 @@ SPDX-License-Identifier: MIT
 
 <script setup lang="ts">
 import { MapData } from "@main/content/maps/map-data";
-import defaultMiniMap from "/src/renderer/assets/images/default-minimap.png?url";
 import { useImageBlobUrlCache } from "@renderer/composables/useImageBlobUrlCache";
 import vStartBox from "@renderer/directives/vStartBox";
 import vStartPos from "@renderer/directives/vStartPos";
 import { computed, defineComponent } from "vue";
+import defaultMiniMap from "/src/renderer/assets/images/default-minimap.png?url";
 
 defineComponent({
     directives: {
@@ -28,15 +28,9 @@ defineComponent({
 const props = defineProps<{
     map: MapData | undefined;
 }>();
-const cache = useImageBlobUrlCache();
-// const { get } = useImageBlobUrlCache();
 
-// const mapTextureUrl = computed(() => {
-//     if (!props.map?.images) {
-//         return;
-//     }
-//     return get(props.map?.springName, props.map?.imagesBlob?.preview);
-// });
+const cache = useImageBlobUrlCache();
+
 const mapTextureUrl = computed(() =>
     props.map?.imagesBlob?.preview ? cache.get(props.map?.springName, props.map?.imagesBlob?.preview) : defaultMiniMap
 );
