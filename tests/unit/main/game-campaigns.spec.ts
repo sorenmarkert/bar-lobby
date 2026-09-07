@@ -86,17 +86,22 @@ describe("getCampaigns", () => {
         };
 
         getGameFilesMock.mockImplementation(async (_packageMd5: string, pattern: string) => {
-            if (pattern === "missions/manifest.json") {
-                return [sdpJson("missions/manifest.json", { campaigns: ["cortex"], scenarios: [] })];
+            if (pattern === "data/singleplayer/campaigns/manifest.json") {
+                return [sdpJson("data/singleplayer/campaigns/manifest.json", { campaigns: ["cortex"], scenarios: [] })];
             }
-            if (pattern === "missions/campaigns/*/campaign.json") {
-                return [sdpJson("missions/campaigns/armada/campaign.json", armadaCampaign), sdpJson("missions/campaigns/cortex/campaign.json", cortexCampaign)];
+            if (pattern === "data/singleplayer/campaigns/*/campaign.json") {
+                return [sdpJson("data/singleplayer/campaigns/armada/campaign.json", armadaCampaign), sdpJson("data/singleplayer/campaigns/cortex/campaign.json", cortexCampaign)];
             }
-            if (pattern === "missions/campaigns/armada/*/mission.json") {
-                return [sdpJson("missions/campaigns/armada/m1/mission.json", mission("m1")), sdpJson("missions/campaigns/armada/m2/mission.json", mission("m2"))];
+            if (pattern === "data/singleplayer/campaigns/armada/*/mission.json") {
+                return [
+                    sdpJson("data/singleplayer/campaigns/armada/m1/mission.json", mission("m1")),
+                    sdpJson("data/singleplayer/campaigns/armada/m2/mission.json", mission("m2")),
+                    // 'shared' is reserved for campaign assets and must never be read as a mission.
+                    sdpJson("data/singleplayer/campaigns/armada/shared/mission.json", mission("shared_should_be_ignored")),
+                ];
             }
-            if (pattern === "missions/campaigns/cortex/*/mission.json") {
-                return [sdpJson("missions/campaigns/cortex/c1/mission.json", mission("c1"))];
+            if (pattern === "data/singleplayer/campaigns/cortex/*/mission.json") {
+                return [sdpJson("data/singleplayer/campaigns/cortex/c1/mission.json", mission("c1"))];
             }
 
             return [];
@@ -116,5 +121,13 @@ describe("getCampaigns", () => {
         expect(campaigns[1].unlocked).toBe(true);
         expect(campaigns[1].missions.m2.unlocked).toBe(true);
         expect(campaigns[1].missions.m1.unlocked).toBe(true);
+    });
+
+    it("ignores the reserved 'shared' folder when collecting missions", async () => {
+        const campaigns = await getCampaigns("pkg-md5");
+        const armada = campaigns.find((campaign) => campaign.campaignId === "armada");
+
+        expect(Object.keys(armada!.missions)).toEqual(["m2", "m1"]);
+        expect(armada!.missions).not.toHaveProperty("shared_should_be_ignored");
     });
 });

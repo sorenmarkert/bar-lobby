@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "campaign.schema.json",
     "title": "Campaign Definition",
-    "description": "Schema for a BAR campaign definition file. Lives at missions/campaigns/<campaign>/campaign.json; every subfolder next to it is a mission.",
+    "description": "Schema for a BAR campaign definition file. Lives at data/singleplayer/campaigns/<campaign>/campaign.json; every subfolder next to it except 'shared' is a mission.",
     "type": "object",
     "required": ["campaignId", "title", "description", "players"],
     "additionalProperties": false,

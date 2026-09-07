@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: MIT
 /**
  * Generates src/main/content/game/generated/*.ts from the JSON Schemas in
- * src/main/content/game/schemas, which are copies of the schemata shipped in the game archive.
+ * src/main/content/game/schemas, which are copies of the schemas shipped in the
+ * game archive at data/singleplayer/schemas.
  *
  * Usage:  node --import=tsx tools/generate-schema-types.ts
  *

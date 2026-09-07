@@ -22,7 +22,10 @@ import missionSchema from "./schemas/mission.schema.json";
 
 const log = logger("game-campaigns.ts");
 const gunzip = util.promisify(zlib.gunzip);
-const CAMPAIGNS_PATH = "missions/campaigns";
+const CAMPAIGNS_PATH = "data/singleplayer/campaigns";
+const CAMPAIGNS_MANIFEST_PATH = `${CAMPAIGNS_PATH}/manifest.json`;
+// Reserved for assets shared by a campaign's missions, so it is never read as a mission.
+const SHARED_DIR_NAME = "shared";
 
 const ajv = new Ajv({ allowUnionTypes: true });
 const validateCampaignFile = ajv.compile<CampaignDefinition>(campaignSchema as unknown as JSONSchemaType<CampaignDefinition>);
@@ -61,7 +64,7 @@ export async function getCampaigns(packageMd5: string): Promise<CampaignModel[]>
 }
 
 async function readManifest(packageMd5: string): Promise<MissionManifest | undefined> {
-    const manifestFiles = await getGameFiles(packageMd5, "missions/manifest.json", true);
+    const manifestFiles = await getGameFiles(packageMd5, CAMPAIGNS_MANIFEST_PATH, true);
     if (manifestFiles.length === 0) {
         return undefined;
     }
@@ -91,6 +94,9 @@ async function parseCampaignFile(campaignFile: SdpFile, packageMd5: string, cach
 
     for (const missionFile of missionJsonFiles) {
         const missionDirName = containingDirName(missionFile);
+        if (missionDirName === SHARED_DIR_NAME) {
+            continue;
+        }
         try {
             const mission = await parseMissionFile(missionFile, packageMd5, campaignJson, campaignDirName, cacheDir);
             if (parsedMissions.some((m) => m.missionId === mission.missionId)) {
