@@ -4,38 +4,44 @@
 
 import type { AllyTeam, MissionDefinition, Team } from "@main/content/game/generated/mission";
 
-/** Ally team as defined in `startScript.allyTeams` of a mission.json. */
-export type AllyTeamModel = AllyTeam;
+export type TeamModel = Omit<Team, "nameKey"> & {
+    name: string;
+};
 
-/** Team as defined in `startScript.allyTeams.<allyTeamName>.teams` of a mission.json. */
-export type TeamModel = Team;
+export type AllyTeamModel = Omit<AllyTeam, "teams"> & {
+    teams: Record<string, TeamModel>;
+};
+export type AllyTeamModel = Omit<AllyTeam, "teams"> & {
+    teams: Record<string, TeamModel>;
+};
 
-/** Everything needed to build the engine start script, as defined in a mission.json. */
-export type MissionStartScript = MissionDefinition["startScript"];
+export type MissionStartScript = Omit<MissionDefinition["startScript"], "allyTeams"> & {
+    allyTeams: Record<string, AllyTeamModel>;
+};
 
-/**
- * Difficulty selection used when building a mission start script.
- *
- * Mission/campaign JSON no longer define these fields, but the converter and
- * UI still accept an optional selected difficulty object.
- */
+export type MissionBriefing = {
+    alliesPresent?: string[];
+    objectives?: string[];
+    knownHostiles?: string[];
+    newUnits?: {
+        unitDefName: string;
+        description: string;
+    }[];
+};
+
 export type MissionDifficulty = {
     name: string;
     playerHandicap: number;
     enemyHandicap: number;
 };
 
-/**
- * Mission as returned to the lobby: extends the schema-validated {@link MissionDefinition}
- * with local-cache paths for images and runtime-populated fields.
- */
-export type MissionModel = MissionDefinition & {
-    /** Undefined for scenarios, which belong to no campaign. */
+export type MissionModel = Omit<MissionDefinition, "titleKey" | "descriptionKey" | "briefing" | "startScript"> & {
+    title: string;
+    description: string;
+    briefing?: MissionBriefing;
+    startScript: MissionStartScript;
     campaignId?: string;
-    /** Path to the mission's folder, relative to the root of the game archive. */
     missionFolder: string;
-    /** Local cache path of the mission image, replacing the filename from the mission file. */
     image?: string;
-    /** Whether this mission is currently unlocked (derived from the campaign's `unlocks` map, not from the mission file). */
     unlocked: boolean;
 };
