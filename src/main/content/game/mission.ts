@@ -11,9 +11,6 @@ export type TeamModel = Omit<Team, "nameKey"> & {
 export type AllyTeamModel = Omit<AllyTeam, "teams"> & {
     teams: Record<string, TeamModel>;
 };
-export type AllyTeamModel = Omit<AllyTeam, "teams"> & {
-    teams: Record<string, TeamModel>;
-};
 
 export type MissionStartScript = Omit<MissionDefinition["startScript"], "allyTeams"> & {
     allyTeams: Record<string, AllyTeamModel>;
